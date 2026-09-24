@@ -1,7 +1,14 @@
-import path from "node:path";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
-import Database from "better-sqlite3";
+import { Pool } from "pg";
+
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  throw new Error(
+    "DATABASE_URL is not set. Copy .env.example to .env.local and point it at Postgres.",
+  );
+}
 
 const socialProviders = {
   ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
@@ -23,7 +30,9 @@ const socialProviders = {
 };
 
 export const auth = betterAuth({
-  database: new Database(path.join(process.cwd(), "sqlite.db")),
+  database: new Pool({
+    connectionString: databaseUrl,
+  }),
   emailAndPassword: {
     enabled: true,
   },
