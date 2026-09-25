@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
+import { admin } from "better-auth/plugins";
 import { Pool } from "pg";
 
 const databaseUrl = process.env.DATABASE_URL;
@@ -37,5 +38,5 @@ export const auth = betterAuth({
     enabled: true,
   },
   ...(Object.keys(socialProviders).length > 0 ? { socialProviders } : {}),
-  plugins: [nextCookies()],
+  plugins: [nextCookies(), admin()],
 });
