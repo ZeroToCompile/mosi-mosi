@@ -1,0 +1,23 @@
+# dependencies / build
+node_modules/
+.next/
+dist/
+coverage/
+*.tsbuildinfo
+
+# env & secrets
+.env
+.env.local
+.env.*.local
+!**/.env.example
+
+# data
+*.db
+*.db-*
+app/phyxius/sqlite.db
+app/phyxius/sqlite.db-*
+
+# misc
+.DS_Store
+*.log
+.cursor/

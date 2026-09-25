@@ -1,0 +1,11 @@
+{
+  "name": "mosi-mosi",
+  "private": true,
+  "scripts": {
+    "docker:up": "docker compose up -d --build postgres api web",
+    "docker:dev": "docker compose --profile dev up postgres api-dev web-dev",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "docker:ps": "docker compose ps"
+  }
+}

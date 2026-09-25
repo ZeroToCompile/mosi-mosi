@@ -1,0 +1,127 @@
+name: mosi-mosi
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: mosi-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-mosi}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mosi}
+      POSTGRES_DB: ${POSTGRES_DB:-mosi}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - mosi_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-mosi} -d ${POSTGRES_DB:-mosi}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./app/brain
+      dockerfile: Dockerfile
+    container_name: mosi-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3001
+      DOMAIN: ${DOMAIN:-localhost}
+      WEB_URL: ${WEB_URL:-http://localhost:3020}
+      API_URL: ${API_URL:-http://localhost:3011}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mosi}:${POSTGRES_PASSWORD:-mosi}@postgres:5432/${POSTGRES_DB:-mosi}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3011}
+      BETTER_AUTH_TRUSTED_ORIGINS: ${BETTER_AUTH_TRUSTED_ORIGINS:-http://localhost:3020,http://127.0.0.1:3020}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@mosimosi.local}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-MosiMosiAdmin!2026}
+      SEED_ADMIN_NAME: ${SEED_ADMIN_NAME:-Admin}
+    ports:
+      - "${API_PORT:-3011}:3001"
+
+  web:
+    build:
+      context: ./app/phyxius
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3011}
+    container_name: mosi-web
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+      DOMAIN: ${DOMAIN:-localhost}
+      WEB_URL: ${WEB_URL:-http://localhost:3020}
+      # Server-side calls use the Docker network hostname
+      API_URL: http://api:3001
+      # Browser-facing auth/API base
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3011}
+    ports:
+      - "${WEB_PORT:-3020}:3000"
+
+  # Hot-reload stack: docker compose --profile dev up
+  api-dev:
+    profiles: ["dev"]
+    image: node:24-alpine
+    container_name: mosi-api-dev
+    working_dir: /app
+    command: sh -c "npm ci && npm run auth:setup && npm run start:dev"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DOMAIN: ${DOMAIN:-localhost}
+      WEB_URL: ${WEB_URL:-http://localhost:3020}
+      API_URL: ${API_URL:-http://localhost:3011}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-mosi}:${POSTGRES_PASSWORD:-mosi}@postgres:5432/${POSTGRES_DB:-mosi}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3011}
+      BETTER_AUTH_TRUSTED_ORIGINS: ${BETTER_AUTH_TRUSTED_ORIGINS:-http://localhost:3020,http://127.0.0.1:3020}
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@mosimosi.local}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-MosiMosiAdmin!2026}
+      SEED_ADMIN_NAME: ${SEED_ADMIN_NAME:-Admin}
+    ports:
+      - "${API_PORT:-3011}:3001"
+    volumes:
+      - ./app/brain:/app
+      - mosi_api_node_modules:/app/node_modules
+
+  web-dev:
+    profiles: ["dev"]
+    image: node:24-alpine
+    container_name: mosi-web-dev
+    working_dir: /app
+    command: sh -c "npm ci && npm run dev -- -H 0.0.0.0 -p 3000"
+    depends_on:
+      - api-dev
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DOMAIN: ${DOMAIN:-localhost}
+      WEB_URL: ${WEB_URL:-http://localhost:3020}
+      API_URL: http://api-dev:3001
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3011}
+    ports:
+      - "${WEB_PORT:-3020}:3000"
+    volumes:
+      - ./app/phyxius:/app
+      - mosi_web_node_modules:/app/node_modules
+
+volumes:
+  mosi_pg_data:
+  mosi_api_node_modules:
+  mosi_web_node_modules:
