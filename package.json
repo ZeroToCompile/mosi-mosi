@@ -6,6 +6,10 @@
     "docker:dev": "docker compose --profile dev up postgres api-dev web-dev",
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
-    "docker:ps": "docker compose ps"
+    "docker:ps": "docker compose ps",
+    "cloud:install": "./scripts/cloud-install.sh",
+    "cloud:start": "./scripts/cloud-start.sh",
+    "dev:api": "cd app/brain && npm run start:dev",
+    "dev:web": "cd app/phyxius && npm run dev -- -H 0.0.0.0 -p 3020"
   }
 }
