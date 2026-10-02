@@ -94,6 +94,7 @@ services:
       SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-admin@mosimosi.local}
       SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-MosiMosiAdmin!2026}
       SEED_ADMIN_NAME: ${SEED_ADMIN_NAME:-Admin}
+      CHOKIDAR_USEPOLLING: "true"
     ports:
       - "${API_PORT:-3011}:3001"
     volumes:
@@ -105,6 +106,8 @@ services:
     image: node:24-alpine
     container_name: mosi-web-dev
     working_dir: /app
+    # Polling: Docker Desktop on Windows/macOS often drops inotify events on
+    # bind mounts, so Turbopack never sees new/edited files (stale routes/HMR).
     command: sh -c "npm ci && npm run dev -- -H 0.0.0.0 -p 3000"
     depends_on:
       - api-dev
@@ -115,6 +118,8 @@ services:
       WEB_URL: ${WEB_URL:-http://localhost:3020}
       API_URL: http://api-dev:3001
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3011}
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
     ports:
       - "${WEB_PORT:-3020}:3000"
     volumes:

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SignOutButton } from "@/components/auth/SignOutButton";
+import { AppSidebar } from "@/components/layout/AppSidebar";
 import { getSession } from "@/lib/session";
 
 export default async function Home() {
@@ -38,15 +39,7 @@ export default async function Home() {
 
       <header className="relative z-10 flex items-start justify-between px-5 pt-6 sm:px-8 md:px-10 md:pt-8">
         <div className="landing-fade flex items-center gap-4">
-          <button
-            type="button"
-            aria-label="Open menu"
-            className="group flex h-10 w-10 flex-col items-start justify-center gap-[5px]"
-          >
-            <span className="block h-px w-5 bg-[var(--ink)] transition-transform group-hover:translate-x-0.5" />
-            <span className="block h-px w-5 bg-[var(--ink)] transition-transform group-hover:translate-x-1" />
-            <span className="block h-px w-3.5 bg-[var(--ink)] transition-transform group-hover:translate-x-0.5" />
-          </button>
+          <AppSidebar signedIn={Boolean(session)} />
           <p className="font-serif text-2xl leading-none tracking-[-0.02em] text-[var(--ink)] sm:text-3xl">
             MosiMosi
           </p>
@@ -57,9 +50,9 @@ export default async function Home() {
             aria-label="Primary"
             className="flex flex-wrap justify-end gap-x-5 gap-y-2 text-[11px] font-medium tracking-[0.14em] uppercase text-[var(--accent)] sm:gap-x-6 sm:text-xs"
           >
-            <a href="#motions" className="transition-opacity hover:opacity-70">
+            <Link href="/motions" className="transition-opacity hover:opacity-70">
               Motions
-            </a>
+            </Link>
             <a href="#matter" className="transition-opacity hover:opacity-70">
               Matter Bank
             </a>
@@ -103,9 +96,9 @@ export default async function Home() {
                   Sign in
                 </Link>
               )}
-              <a href="#motions" className="landing-cta">
+              <Link href="/motions" className="landing-cta">
                 Browse Motions
-              </a>
+              </Link>
             </div>
           </div>
 

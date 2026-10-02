@@ -25,7 +25,7 @@ RUN npm install --omit=dev && npm cache clean --force \
 
 COPY --from=build --chown=nest:nest /app/dist ./dist
 COPY --chown=nest:nest docker-entrypoint.sh /app/docker-entrypoint.sh
-RUN chmod +x /app/docker-entrypoint.sh
+RUN sed -i 's/\r$//' /app/docker-entrypoint.sh && chmod +x /app/docker-entrypoint.sh
 
 USER nest
 EXPOSE 3001

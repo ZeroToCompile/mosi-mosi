@@ -10,6 +10,17 @@
   --accent-soft: #c46a4a;
   --line: color-mix(in srgb, var(--ink) 14%, transparent);
   --paper-glow: color-mix(in srgb, #fff8ef 55%, transparent);
+
+  /* Velvety dark-red sidebar — lifted to sit nearer homepage accent */
+  --sidebar-deep: #4a1a1c;
+  --sidebar-mid: #5e2426;
+  --sidebar-lift: #7a3234;
+  --sidebar-ink: #f3e8e5;
+  --sidebar-muted: #d0b0ab;
+  --sidebar-bubble: #7a3234;
+  --sidebar-bubble-hot: #934042;
+  --sidebar-line: color-mix(in srgb, var(--sidebar-ink) 16%, transparent);
+  --sidebar-hover: color-mix(in srgb, var(--sidebar-lift) 40%, transparent);
 }
 
 @theme inline {
@@ -17,6 +28,7 @@
   --color-foreground: var(--ink);
   --font-sans: var(--font-outfit);
   --font-serif: var(--font-instrument);
+  --font-sidebar: var(--font-space);
 }
 
 * {
@@ -129,10 +141,71 @@ body {
   transform: scaleX(1);
 }
 
+.motion-row {
+  transition: background-color 0.2s ease;
+}
+
+.motion-row:hover {
+  background: color-mix(in srgb, var(--ink) 3.5%, transparent);
+}
+
+.sidebar-panel {
+  transform: translate3d(-108%, 0, 0);
+  transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+  isolation: isolate;
+  background: var(--sidebar-deep);
+}
+
+.sidebar-panel--open {
+  transform: translate3d(0, 0, 0);
+}
+
+.sidebar-panel--closed {
+  transform: translate3d(-108%, 0, 0);
+}
+
+.sidebar-velvet {
+  background:
+    radial-gradient(120% 70% at 0% 0%, color-mix(in srgb, var(--sidebar-lift) 45%, transparent), transparent 58%),
+    radial-gradient(90% 55% at 100% 100%, color-mix(in srgb, var(--sidebar-deep) 50%, transparent), transparent 62%),
+    linear-gradient(168deg, var(--sidebar-mid) 0%, var(--sidebar-deep) 78%);
+  box-shadow: inset -10px 0 28px color-mix(in srgb, black 14%, transparent);
+}
+
+.sidebar-velvet::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.16;
+  /* Keep grain inside the panel — do not blend with page H1 behind */
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  pointer-events: none;
+}
+
+.sidebar-panel > .relative {
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar-close {
+  box-shadow: 0 8px 18px rgba(28, 6, 10, 0.35);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-rise,
   .landing-fade,
   .landing-brand {
     animation: none;
+  }
+
+  .sidebar-panel {
+    transition: none;
+  }
+
+  .sidebar-close {
+    transition: none;
   }
 }
