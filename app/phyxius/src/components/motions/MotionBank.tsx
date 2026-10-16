@@ -7,17 +7,20 @@ import {
   type ReactNode,
 } from "react";
 import {
-  MOCK_MOTIONS,
   MOTION_DIFFICULTIES,
   MOTION_FORMATS,
-  MOTION_THEMES,
   type Motion,
   type MotionDifficulty,
   type MotionFormat,
-  type MotionTheme,
-} from "@/data/motions";
+} from "@/lib/motion-types";
 
 type SortKey = "newest" | "oldest" | "az";
+
+type MotionBankProps = {
+  motions: Motion[];
+  themes: string[];
+  loadError?: string | null;
+};
 
 function matchesQuery(motion: Motion, query: string) {
   if (!query) return true;
@@ -34,10 +37,14 @@ function matchesQuery(motion: Motion, query: string) {
   return haystack.includes(query);
 }
 
-export function MotionBank() {
+export function MotionBank({
+  motions,
+  themes,
+  loadError = null,
+}: MotionBankProps) {
   const [query, setQuery] = useState("");
   const [format, setFormat] = useState<MotionFormat | "All">("All");
-  const [theme, setTheme] = useState<MotionTheme | "All">("All");
+  const [theme, setTheme] = useState<string | "All">("All");
   const [difficulty, setDifficulty] = useState<MotionDifficulty | "All">(
     "All",
   );
@@ -46,7 +53,7 @@ export function MotionBank() {
   const deferredQuery = useDeferredValue(query.trim().toLowerCase());
 
   const filtered = useMemo(() => {
-    const list = MOCK_MOTIONS.filter((motion) => {
+    const list = motions.filter((motion) => {
       if (format !== "All" && motion.format !== format) return false;
       if (theme !== "All" && motion.theme !== theme) return false;
       if (difficulty !== "All" && motion.difficulty !== difficulty)
@@ -61,7 +68,7 @@ export function MotionBank() {
       return b.year - a.year || a.id.localeCompare(b.id);
     });
     return sorted;
-  }, [deferredQuery, difficulty, format, sort, theme]);
+  }, [deferredQuery, difficulty, format, motions, sort, theme]);
 
   const clearFilters = () => {
     setQuery("");
@@ -108,6 +115,12 @@ export function MotionBank() {
             </button>
           ) : null}
         </div>
+
+        {loadError ? (
+          <p role="alert" className="mt-3 text-sm text-red-700">
+            {loadError}
+          </p>
+        ) : null}
       </div>
 
       <aside className="border-t border-[var(--ink)] pt-5 lg:sticky lg:top-8 lg:col-start-2 lg:row-span-2 lg:self-start lg:border-t-0 lg:border-l lg:border-[var(--ink)] lg:pt-0 lg:pl-8 xl:pl-10">
@@ -152,7 +165,7 @@ export function MotionBank() {
             >
               All
             </FilterChip>
-            {MOTION_THEMES.map((item) => (
+            {themes.map((item) => (
               <FilterChip
                 key={item}
                 active={theme === item}

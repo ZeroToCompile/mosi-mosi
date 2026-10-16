@@ -2,7 +2,7 @@
 
 import { FormEvent, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { createAdminUser } from "@/app/admin/users/actions";
+import { createAdminUser } from "@/lib/admin-users";
 
 export type AdminUserRow = {
   id: string;

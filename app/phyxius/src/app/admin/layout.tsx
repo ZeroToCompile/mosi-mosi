@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation";
-import { AdminShell } from "@/components/admin/AdminShell";
 import { hasAdminRole } from "@/lib/admin";
 import { getSession } from "@/lib/session";
 
@@ -18,9 +17,5 @@ export default async function AdminLayout({
     redirect("/");
   }
 
-  return (
-    <AdminShell userLabel={session.user.name || session.user.email}>
-      {children}
-    </AdminShell>
-  );
+  return children;
 }

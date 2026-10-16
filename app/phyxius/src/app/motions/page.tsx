@@ -2,6 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { MotionBank } from "@/components/motions/MotionBank";
+import { apiUrl } from "@/lib/auth-api";
+import {
+  toMotionListItem,
+  type MotionCatalogueItem,
+} from "@/lib/motion-types";
 import { getSession } from "@/lib/session";
 
 export const metadata: Metadata = {
@@ -10,8 +15,49 @@ export const metadata: Metadata = {
     "Browse, search, and filter debate motions by format, theme, and level.",
 };
 
+async function loadMotions() {
+  try {
+    const [motionsRes, themesRes] = await Promise.all([
+      fetch(apiUrl("/motions"), { cache: "no-store" }),
+      fetch(apiUrl("/motions/themes"), { cache: "no-store" }),
+    ]);
+
+    if (!motionsRes.ok) {
+      return {
+        motions: [],
+        themes: [] as string[],
+        error: "Could not load the motion catalogue.",
+      };
+    }
+
+    const items = (await motionsRes.json()) as MotionCatalogueItem[];
+    const themesPayload = themesRes.ok
+      ? ((await themesRes.json()) as Array<{ name: string }>)
+      : [];
+
+    const themes = (
+      themesPayload.length > 0
+        ? themesPayload.map((theme) => theme.name)
+        : [...new Set(items.map((item) => item.theme))]
+    ).sort((a, b) => a.localeCompare(b));
+
+    return {
+      motions: items.map(toMotionListItem),
+      themes,
+      error: null as string | null,
+    };
+  } catch {
+    return {
+      motions: [],
+      themes: [] as string[],
+      error: "Could not reach the motion catalogue.",
+    };
+  }
+}
+
 export default async function MotionsPage() {
   const session = await getSession();
+  const { motions, themes, error } = await loadMotions();
 
   return (
     <div className="relative min-h-dvh bg-[var(--bg)] text-[var(--ink)]">
@@ -73,11 +119,11 @@ export default async function MotionsPage() {
           </h1>
           <p className="mt-5 max-w-md text-sm leading-relaxed text-[var(--muted)] sm:text-[15px]">
             A working catalogue of debate motions — filter by format, theme, and
-            level. Mock set for now; real bank next.
+            level.
           </p>
         </div>
 
-        <MotionBank />
+        <MotionBank motions={motions} themes={themes} loadError={error} />
       </main>
     </div>
   );

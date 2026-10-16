@@ -64,11 +64,24 @@ export function AdminShell({ userLabel, children }: AdminShellProps) {
             })}
           </nav>
 
-          <div className="mt-auto hidden border-t border-zinc-200 p-3 md:block">
-            <p className="truncate px-1 text-xs text-zinc-500">{userLabel}</p>
+          <div className="mt-auto space-y-2 border-t border-zinc-200 p-3">
+            <Link
+              href="/admin/content-administration"
+              className="block rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2.5 transition-colors hover:border-zinc-300 hover:bg-zinc-100"
+            >
+              <span className="block text-sm font-medium text-zinc-900">
+                Content administration
+              </span>
+              <span className="mt-0.5 block text-[11px] text-zinc-500">
+                Motions, themes, tournaments, tags
+              </span>
+            </Link>
+            <p className="hidden truncate px-1 text-xs text-zinc-500 md:block">
+              {userLabel}
+            </p>
             <Link
               href="/"
-              className="mt-2 block rounded-md px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-100"
+              className="hidden rounded-md px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-100 md:block"
             >
               Back to site
             </Link>
