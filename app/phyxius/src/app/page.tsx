@@ -53,9 +53,9 @@ export default async function Home() {
             <Link href="/motions" className="transition-opacity hover:opacity-70">
               Motions
             </Link>
-            <a href="#matter" className="transition-opacity hover:opacity-70">
+            <Link href="/matter" className="transition-opacity hover:opacity-70">
               Matter Bank
-            </a>
+            </Link>
             <a href="#docs" className="transition-opacity hover:opacity-70">
               Docs
             </a>

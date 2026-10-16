@@ -98,9 +98,9 @@ export default async function MotionsPage() {
           <Link href="/motions" className="landing-cta" data-active="true">
             Motions
           </Link>
-          <a href="#matter" className="transition-opacity hover:opacity-70">
+          <Link href="/matter" className="transition-opacity hover:opacity-70">
             Matter Bank
-          </a>
+          </Link>
           <a href="#docs" className="transition-opacity hover:opacity-70">
             Docs
           </a>

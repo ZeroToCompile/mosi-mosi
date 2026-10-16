@@ -19,7 +19,7 @@ const primaryNav: NavItem[] = [
     icon: <IconMotions />,
   },
   {
-    href: "#matter",
+    href: "/matter",
     label: "Matter Bank",
     description: "Evidence & framing notes",
     icon: <IconLibrary />,
@@ -222,6 +222,33 @@ export function AppSidebar({ signedIn = false }: AppSidebarProps) {
   );
 }
 
+function NavAnchor({
+  href,
+  onNavigate,
+  children,
+}: {
+  href: string;
+  onNavigate: () => void;
+  children: React.ReactNode;
+}) {
+  const className =
+    "sidebar-link group flex items-center gap-2.5 px-1 py-1.5 transition-colors hover:bg-[var(--sidebar-hover)]";
+
+  if (href.startsWith("/")) {
+    return (
+      <Link href={href} onClick={onNavigate} className={className}>
+        {children}
+      </Link>
+    );
+  }
+
+  return (
+    <a href={href} onClick={onNavigate} className={className}>
+      {children}
+    </a>
+  );
+}
+
 function NavSection({
   title,
   items,
@@ -239,11 +266,7 @@ function NavSection({
       <ul className="flex flex-col">
         {items.map((item) => (
           <li key={item.href}>
-            <a
-              href={item.href}
-              onClick={onNavigate}
-              className="sidebar-link group flex items-center gap-2.5 px-1 py-1.5 transition-colors hover:bg-[var(--sidebar-hover)]"
-            >
+            <NavAnchor href={item.href} onNavigate={onNavigate}>
               <span className="sidebar-icon grid h-8 w-8 shrink-0 place-items-center text-[var(--sidebar-ink)]">
                 {item.icon}
               </span>
@@ -255,7 +278,7 @@ function NavSection({
                   {item.description}
                 </span>
               </span>
-            </a>
+            </NavAnchor>
           </li>
         ))}
       </ul>
